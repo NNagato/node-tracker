@@ -155,7 +155,7 @@ func queryData(tx *bolt.Tx, data *common.DataTimeResponse, bucket string, fromTi
 	c := b.Cursor()
 	max, _ := c.Last()
 	min := uint64ToBytes(fromTime)
-	min, _ = c.First()
+	// min, _ = c.First()
 
 	for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
 		tickTime := bytesToUint64(k)
