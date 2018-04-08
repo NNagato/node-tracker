@@ -52,7 +52,7 @@ func (self *Server) GetData(c *gin.Context) {
 
 func (self *Server) Run() {
 	go self.collector.GetLog()
-	self.r.Use(static.Serve("/", static.LocalFile("/go/src/github.com/Gin/node-tracker/app", true)))
+	self.r.Use(static.Serve("/", static.LocalFile("/home/ubuntu/go/src/github.com/Gin/node-tracker/app", true)))
 
 	api := self.r.Group("/api")
 	api.GET("/data", self.GetData)

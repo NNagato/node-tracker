@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	PATH string = "/go/src/github.com/Gin/node-tracker/storage/gin.db"
+	PATH string = "/home/ubuntu/go/src/github.com/Gin/node-tracker/storage/gin.db"
 
 	GAS_PRICE string = "eth_gasPrice"
 	BLOCK_NUM string = "eth_blockNumber"
@@ -161,7 +161,7 @@ func (self *BoltStorage) GetLatestVersion() float64 {
 			b := tx.Bucket([]byte(bucket))
 			c := b.Cursor()
 			latest, _ := c.Last()
-			if bytes.Compare(latestTimeByte, latest) <= 0 {
+			if bytes.Compare(latestTimeByte, latest) < 0 {
 				latestTimeByte = latest
 			}
 		}

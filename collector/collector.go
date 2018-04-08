@@ -42,7 +42,7 @@ func NewCollector() *Collector {
 }
 
 // const file_log string = "/home/gin/Gin/Testspace/golang/write-and-read-file/file.txt"
-const file_log string = "/go/src/github.com/Gin/node-tracker/data/rpc.log.1"
+const file_log string = "/var/log/nginx/rpc.log"
 
 func (self *Collector) GetLog() {
 	latestVersion := self.db.GetLatestVersion()
