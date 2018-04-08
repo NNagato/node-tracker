@@ -33,6 +33,7 @@ const (
 	GET_UNCLE_BY_BLOCK_HASH_AND_INDEX string = "eth_getUncleByBlockHashAndIndex"
 	GET_UNCLE_BY_BLOCK_NUM_AND_INDEX string = "eth_getUncleByBlockNumberAndIndex"
 	GET_LOG string = "eth_getLogs"
+	ONE string = "1"
 )
 
 var ListBucket = []string{
@@ -55,6 +56,7 @@ var ListBucket = []string{
 	GET_UNCLE_BY_BLOCK_HASH_AND_INDEX,
 	GET_UNCLE_BY_BLOCK_NUM_AND_INDEX,
 	GET_LOG,
+	ONE,
 }
 
 type BoltStorage struct {
@@ -89,6 +91,7 @@ func NewStorage() *BoltStorage {
 		tx.CreateBucket([]byte(GET_UNCLE_BY_BLOCK_HASH_AND_INDEX))
 		tx.CreateBucket([]byte(GET_UNCLE_BY_BLOCK_NUM_AND_INDEX))
 		tx.CreateBucket([]byte(GET_LOG))
+		tx.CreateBucket([]byte(ONE))
 
 		return nil
 	})
