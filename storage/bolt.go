@@ -16,6 +16,7 @@ const (
 	GAS_PRICE string = "eth_gasPrice"
 	BLOCK_NUM string = "eth_blockNumber"
 	GET_BALANCE string = "eth_getBalance"
+	GET_BLOCKTXCOUNT_BY_NUM string = "eth_getBlockTransactionCountByNumber"
 	// GET_STORAGE_AT 
 	GET_TX_COUNT string = "eth_getTransactionCount"
 	GET_CODE string = "eth_getCode"
@@ -26,7 +27,11 @@ const (
 	GET_BLOCK_BY_HASH string = "eth_getBlockByHash"
 	GET_BLOCK_BY_NUM string = "eth_getBlockByNumber"
 	GET_TX_BY_HASH string = "eth_getTransactionByHash"
+	GET_TX_BY_BLOCK_HASH_AND_INDEX string = "eth_getTransactionByBlockHashAndIndex"
+	GET_TX_BY_BLOCK_NUM_AND_INDEX string = "eth_getTransactionByBlockNumberAndIndex"
 	GET_TX_RECEIPT string = "eth_getTransactionReceipt"
+	GET_UNCLE_BY_BLOCK_HASH_AND_INDEX string = "eth_getUncleByBlockHashAndIndex"
+	GET_UNCLE_BY_BLOCK_NUM_AND_INDEX string = "eth_getUncleByBlockNumberAndIndex"
 	GET_LOG string = "eth_getLogs"
 )
 
@@ -34,6 +39,7 @@ var ListBucket = []string{
 	GAS_PRICE,
 	BLOCK_NUM,
 	GET_BALANCE,
+	GET_BLOCKTXCOUNT_BY_NUM,
 	GET_TX_COUNT,
 	GET_CODE,
 	SEND_TX,
@@ -43,7 +49,11 @@ var ListBucket = []string{
 	GET_BLOCK_BY_HASH,
 	GET_BLOCK_BY_NUM,
 	GET_TX_BY_HASH,
+	GET_TX_BY_BLOCK_HASH_AND_INDEX,
+	GET_TX_BY_BLOCK_NUM_AND_INDEX,
 	GET_TX_RECEIPT,
+	GET_UNCLE_BY_BLOCK_HASH_AND_INDEX,
+	GET_UNCLE_BY_BLOCK_NUM_AND_INDEX,
 	GET_LOG,
 }
 
