@@ -73,6 +73,7 @@ func NewStorage() *BoltStorage {
 		tx.CreateBucket([]byte(GAS_PRICE))
 		tx.CreateBucket([]byte(BLOCK_NUM))
 		tx.CreateBucket([]byte(GET_BALANCE))
+		tx.CreateBucket([]byte(GET_BLOCKTXCOUNT_BY_NUM))
 		tx.CreateBucket([]byte(GET_TX_COUNT))
 		tx.CreateBucket([]byte(GET_CODE))
 		tx.CreateBucket([]byte(SEND_TX))
@@ -82,7 +83,11 @@ func NewStorage() *BoltStorage {
 		tx.CreateBucket([]byte(GET_BLOCK_BY_HASH))
 		tx.CreateBucket([]byte(GET_BLOCK_BY_NUM))
 		tx.CreateBucket([]byte(GET_TX_BY_HASH))
+		tx.CreateBucket([]byte(GET_TX_BY_BLOCK_HASH_AND_INDEX))
+		tx.CreateBucket([]byte(GET_TX_BY_BLOCK_NUM_AND_INDEX))
 		tx.CreateBucket([]byte(GET_TX_RECEIPT))
+		tx.CreateBucket([]byte(GET_UNCLE_BY_BLOCK_HASH_AND_INDEX))
+		tx.CreateBucket([]byte(GET_UNCLE_BY_BLOCK_NUM_AND_INDEX))
 		tx.CreateBucket([]byte(GET_LOG))
 
 		return nil
