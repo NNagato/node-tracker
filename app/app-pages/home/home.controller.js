@@ -44,7 +44,7 @@
           "lineColor": "#d1655d",
           "lineThickness": 2,
           "negativeLineColor": "#637bb6",
-          "type": "smoothedLine",
+          "type": "line",
           "valueField": "delay"
         }],
         "chartScrollbar": {

@@ -67,7 +67,7 @@ func (self *Collector) GetLog() {
 		}
 		timeRequest, _ := time.Parse(time.RFC3339, jsonData.TimeUTC)
 		jsonData.TimeHandled = float64(timeRequest.Unix())
-		if jsonData.RequestBody != "-" && jsonData.TimeHandled > latestVersion {
+		if jsonData.RequestBody != "-" && jsonData.TimeHandled >= latestVersion {
 			jsonArray = append(jsonArray, jsonData)
 			if len(jsonArray) == 2000 {
 				log.Println("new pack to save")
