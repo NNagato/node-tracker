@@ -10,6 +10,22 @@
   function HomeController($rootScope, $scope, $http, ServerService) {
     var vm = this;
     $scope.addChart = addChart;
+    vm.maxTimeResponse = maxTimeResponse;
+
+    function maxTimeResponse(rpc, data) {
+      var max = 0;
+      for(var key in data){
+        var millisecond = Math.round(parseFloat(data[key]) * 1000 * 10) / 10;
+        if (millisecond > max) {
+          max = millisecond;
+        }
+      }
+      if (max >= 1000) {
+        return (max / 1000) + " s"
+      } else {
+        return max + " ms"
+      }
+    }
 
     function addChart(id, rpc, data) {
       var trueId = "chart" + id;
@@ -17,8 +33,8 @@
       // console.log("data make chart: ", trueId, rpc, trueData);
       var firstIndex;
       var lastIndex = trueData.length - 1;
-      if (trueData.length > 50) {
-        firstIndex = trueData.length - 50;
+      if (trueData.length > 120) {
+        firstIndex = trueData.length - 120;
       } else {
         firstIndex = 0;
       }
@@ -110,16 +126,29 @@
     })();
 
     function makeChartData(data) {
-      // console.log(data)
+      var tickTime = parseInt(Object.keys(data)[0]);
       var chartData = [];
       for(var key in data){
         var keyNum = parseInt(key);
+        if (keyNum > tickTime) {
+          while (true) {
+            var temDate = getDateFormat(tickTime);
+            chartData.push({
+              time: temDate,
+              delay: 0
+            });
+            tickTime += 60;
+            if (tickTime == keyNum) {
+              break;
+            }
+          }
+        }
         var date = getDateFormat(keyNum);
-        // console.log("parse string: ", keyNum.toString(), data[key].toString());
         chartData.push({
           time: date,
           delay: Math.round(parseFloat(data[key]) * 1000 * 10) / 10
         });
+        tickTime += 60;
       }
       return chartData;
     }

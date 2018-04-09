@@ -32,6 +32,5 @@
       })
 
       .otherwise({ redirectTo: '/' });
-      console.log("this is config")
     }
 })()
