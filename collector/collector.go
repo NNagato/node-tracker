@@ -99,22 +99,11 @@ func makeTrueData(allSaveData map[string][][]float64) map[string][][]float64 {
 	trueStoreData := make(map[string][][]float64)
 
 	for rpc, saveData := range allSaveData {
-		// saveData := allSaveData["eth_estimateGas"]
-		// rpc := "eth_estimateGas"
 		var sum float64
 		var tickTime float64
 		var countIndex int
 
 		for i, data := range saveData {
-			// if data[1] == float64(60.001) {
-			// 	log.Println(data[0])
-			// 	log.Println(tickTime)
-			// 	log.Println(i - countIndex)
-			// 	log.Println(sum)
-			// }
-			// if data[0] < float64(1523041380) && data[0] > float64(1523041200){
-			// 	log.Println(sum, i - countIndex)
-			// }
 			if len(trueStoreData[rpc]) == 0 && i == 0 {
 				var firstPackTick float64 = 0
 				if (data[0] / tickDistance) - float64(uint64(data[0] / tickDistance)) == 0 {
@@ -124,9 +113,6 @@ func makeTrueData(allSaveData map[string][][]float64) map[string][][]float64 {
 				}
 				trueStoreData[rpc] = append(trueStoreData[rpc], []float64{firstPackTick, data[1]})
 				tickTime = firstPackTick + tickDistance
-				if data[1] == float64(60.001) {
-					log.Println(tickTime)
-				}
 				countIndex = 1
 				sum = 0
 				continue
@@ -139,24 +125,28 @@ func makeTrueData(allSaveData map[string][][]float64) map[string][][]float64 {
 					lenArray := len(trueStoreData[rpc]) - 1
 					oldVal := trueStoreData[rpc][lenArray][1]
 					trueStoreData[rpc][lenArray][1] = (avg + oldVal)/float64(2)
-					// trueStoreData[rpc] = append(trueStoreData[rpc], []float64{data[0], avg})
 				}
 			} else {
+				// if sum == 0 {
+				// 	for {
+				// 		trueStoreData[rpc] = append(trueStoreData[rpc], []float64{tickTime, 0})
+				// 		tickTime += tickDistance
+				// 		if data[0] <= tickTime {
+				// 			sum += data[1]
+				// 			break
+				// 		}
+				// 	}
+				// }
 				if i == countIndex {
 					aloneTick := float64(int64((data[0])/tickDistance)) * tickDistance
 					trueStoreData[rpc] = append(trueStoreData[rpc], []float64{aloneTick, data[1]})
 					tickTime = aloneTick + tickDistance
-					if data[1] == float64(60.001) {
-						log.Println(tickTime)
-					}
+					countIndex += 1
 				}
 				if i > countIndex {
 					avg := sum / float64(i - countIndex)
 					trueStoreData[rpc] = append(trueStoreData[rpc], []float64{tickTime, avg})
 					tickTime += tickDistance
-					if data[1] == float64(60.001) {
-						log.Println(tickTime)
-					}
 					countIndex = i
 					sum = data[1]
 				}
