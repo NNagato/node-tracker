@@ -13,13 +13,18 @@ import (
 const (
 	PATH string = "/home/ubuntu/go/src/github.com/Gin/node-tracker/storage/gin.db"
 
+	NET_VERSION string = "net_version"
+	NET_PEERCOUNT string = "net_peerCount"
+	NET_LISTENING string = "net_listening"
+	ETH_PROTOCOLVERSION string = "eth_protocolVersion"
 	GAS_PRICE string = "eth_gasPrice"
 	BLOCK_NUM string = "eth_blockNumber"
 	GET_BALANCE string = "eth_getBalance"
+	GET_STORAGE_AT string = "eth_getStorageAt"
 	GET_BLOCKTXCOUNT_BY_NUM string = "eth_getBlockTransactionCountByNumber"
-	// GET_STORAGE_AT 
 	GET_TX_COUNT string = "eth_getTransactionCount"
 	GET_CODE string = "eth_getCode"
+	SIGN string = "eth_sign"
 	SEND_TX string = "eth_sendTransaction"
 	SEND_RAW_TX string = "eth_sendRawTransaction"
 	ETH_CALL string = "eth_call"
@@ -32,17 +37,24 @@ const (
 	GET_TX_RECEIPT string = "eth_getTransactionReceipt"
 	GET_UNCLE_BY_BLOCK_HASH_AND_INDEX string = "eth_getUncleByBlockHashAndIndex"
 	GET_UNCLE_BY_BLOCK_NUM_AND_INDEX string = "eth_getUncleByBlockNumberAndIndex"
+	COMPILE_SOLIDITY string = "eth_compileSolidity"
 	GET_LOG string = "eth_getLogs"
 	ONE string = "1"
 )
 
 var ListBucket = []string{
+	NET_VERSION,
+	NET_PEERCOUNT,
+	NET_LISTENING,
+	ETH_PROTOCOLVERSION,
 	GAS_PRICE,
 	BLOCK_NUM,
 	GET_BALANCE,
+	GET_STORAGE_AT,
 	GET_BLOCKTXCOUNT_BY_NUM,
 	GET_TX_COUNT,
 	GET_CODE,
+	SIGN,
 	SEND_TX,
 	SEND_RAW_TX,
 	ETH_CALL,
@@ -55,6 +67,7 @@ var ListBucket = []string{
 	GET_TX_RECEIPT,
 	GET_UNCLE_BY_BLOCK_HASH_AND_INDEX,
 	GET_UNCLE_BY_BLOCK_NUM_AND_INDEX,
+	COMPILE_SOLIDITY,
 	GET_LOG,
 	ONE,
 }
@@ -72,12 +85,18 @@ func NewStorage() *BoltStorage {
 	}
 
 	db.Update(func(tx *bolt.Tx) error {
+		tx.CreateBucket([]byte(NET_VERSION))
+		tx.CreateBucket([]byte(NET_PEERCOUNT))
+		tx.CreateBucket([]byte(NET_LISTENING))
+		tx.CreateBucket([]byte(ETH_PROTOCOLVERSION))
 		tx.CreateBucket([]byte(GAS_PRICE))
 		tx.CreateBucket([]byte(BLOCK_NUM))
 		tx.CreateBucket([]byte(GET_BALANCE))
+		tx.CreateBucket([]byte(GET_STORAGE_AT))
 		tx.CreateBucket([]byte(GET_BLOCKTXCOUNT_BY_NUM))
 		tx.CreateBucket([]byte(GET_TX_COUNT))
 		tx.CreateBucket([]byte(GET_CODE))
+		tx.CreateBucket([]byte(SIGN))
 		tx.CreateBucket([]byte(SEND_TX))
 		tx.CreateBucket([]byte(SEND_RAW_TX))
 		tx.CreateBucket([]byte(ETH_CALL))
@@ -90,6 +109,7 @@ func NewStorage() *BoltStorage {
 		tx.CreateBucket([]byte(GET_TX_RECEIPT))
 		tx.CreateBucket([]byte(GET_UNCLE_BY_BLOCK_HASH_AND_INDEX))
 		tx.CreateBucket([]byte(GET_UNCLE_BY_BLOCK_NUM_AND_INDEX))
+		tx.CreateBucket([]byte(COMPILE_SOLIDITY))
 		tx.CreateBucket([]byte(GET_LOG))
 		tx.CreateBucket([]byte(ONE))
 
