@@ -41,7 +41,6 @@ func NewCollector() *Collector {
 	}
 }
 
-// const file_log string = "/home/gin/Gin/Testspace/golang/write-and-read-file/file.txt"
 const file_log string = "/var/log/nginx/rpc.log"
 
 func (self *Collector) GetLog() {
@@ -101,28 +100,23 @@ func makeTrueData(allSaveData map[string][][]float64) map[string][][]float64 {
 		var tickTime float64
 		var countIndex int
 
+		if (saveData[0][0] / tickDistance) - float64(uint64(saveData[0][0] / tickDistance)) == 0 {
+			tickTime = saveData[0][0]
+		} else {
+			tickTime = float64(int64((saveData[0][0] + tickDistance)/tickDistance)) * tickDistance	
+		}
 		for i, data := range saveData {
-			if len(trueStoreData[rpc]) == 0 && i == 0 {
-				var firstPackTick float64 = 0
-				if (data[0] / tickDistance) - float64(uint64(data[0] / tickDistance)) == 0 {
-					firstPackTick = data[0]
-				} else {
-					firstPackTick = float64(int64((data[0] + tickDistance)/tickDistance)) * tickDistance	
-				}
-				trueStoreData[rpc] = append(trueStoreData[rpc], []float64{firstPackTick, data[1]})
-				tickTime = firstPackTick + tickDistance
-				countIndex = 1
-				sum = 0
-				continue
-			} 
-
 			if data[0] <= tickTime {
 				sum += data[1]
 				if i == len(saveData) - 1 {
 					avg := sum / float64(i - countIndex + 1)
-					lenArray := len(trueStoreData[rpc]) - 1
-					oldVal := trueStoreData[rpc][lenArray][1]
-					trueStoreData[rpc][lenArray][1] = (avg + oldVal)/float64(2)
+					if len(trueStoreData[rpc]) > 0 {
+						lenArray := len(trueStoreData[rpc]) - 1
+						oldVal := trueStoreData[rpc][lenArray][1]
+						trueStoreData[rpc][lenArray][1] = (avg + oldVal)/float64(2)
+					} else {
+						trueStoreData[rpc] = append(trueStoreData[rpc], []float64{tickTime, data[1]})
+					}
 				}
 			} else {
 				if i == countIndex {
