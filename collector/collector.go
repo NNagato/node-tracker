@@ -63,6 +63,7 @@ func (self *Collector) GetLog() {
 		if err != nil {
 			log.Println(text)
 			log.Println("error marshal: ", err)
+			continue
 		}
 		timeRequest, _ := time.Parse(time.RFC3339, jsonData.TimeUTC)
 		jsonData.TimeHandled = float64(timeRequest.Unix())
