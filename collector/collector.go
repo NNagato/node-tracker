@@ -24,6 +24,10 @@ type JSON struct {
 	RequestBody string `json:"request_body"`
 }
 
+type RequestBody struct {
+	Method      string `json:"method"`
+}
+
 type SaveData struct {
 	Time         int64
 	TimeResponse float64
@@ -58,7 +62,7 @@ func (self *Collector) GetLog() {
 	var text string
 	var jsonArray []JSON
 	for line := range t.Lines {
-		text = strings.Replace(line.Text, "\\x22", "", -1)
+		text = strings.Replace(line.Text, "\\x22", "kw", -1)
 		err = json.Unmarshal([]byte(text), &jsonData)
 		if err != nil {
 			log.Println(text)
@@ -80,14 +84,19 @@ func (self *Collector) GetLog() {
 
 func (self *Collector) HandleJsonArray(jsonArray []JSON) {
 	allSaveData := make(map[string][][]float64)
-	for _, json := range jsonArray {
-		bodyArray := strings.Split(json.RequestBody, ",")
-		methodArray := strings.Split(bodyArray[2], ":")
-		method := methodArray[1]
-		// log.Println("method: ", method, len(allSaveData[method]))
-		timeResponse, _ := strconv.ParseFloat(json.RequestTime, 64)
+	var rb string
+	var rbInstance RequestBody
+	var err error
+	for _, jsonEle := range jsonArray {
+		rb = strings.Replace(jsonEle.RequestBody, "kw", "\"", -1)
+		err = json.Unmarshal([]byte(rb), &rbInstance)
+		if err != nil {
+			log.Println(rb, err)
+		}
+		method := rbInstance.Method
+		timeResponse, _ := strconv.ParseFloat(jsonEle.RequestTime, 64)
 
-		allSaveData[method] = append(allSaveData[method], []float64{json.TimeHandled, timeResponse})		
+		allSaveData[method] = append(allSaveData[method], []float64{jsonEle.TimeHandled, timeResponse})		
 	}
 	trueStoreData := makeTrueData(allSaveData)
 	self.db.StorageTimeResponse(trueStoreData)
