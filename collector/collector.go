@@ -1,20 +1,20 @@
 package collector
 
 import (
-	"strings"
 	"encoding/json"
-	"strconv"
-	"time"
 	"log"
+	"strconv"
+	"strings"
+	"time"
 
-	"github.com/hpcloud/tail"
-	"github.com/Gin/node-tracker/storage"
 	"github.com/Gin/node-tracker/common"
+	"github.com/Gin/node-tracker/storage"
+	"github.com/hpcloud/tail"
 )
 
 const (
 	tickDistance float64 = 60
-	timeBack int64 = 43200 // 12 hours in second
+	timeBack     int64   = 43200 // 12 hours in second
 )
 
 type JSON struct {
@@ -25,13 +25,13 @@ type JSON struct {
 }
 
 type RequestBody struct {
-	Method      string `json:"method"`
+	Method string `json:"method"`
 }
 
 type SaveData struct {
 	Time         int64
 	TimeResponse float64
-	Method       string 
+	Method       string
 }
 
 type Collector struct {
@@ -50,7 +50,7 @@ const file_log string = "/var/log/nginx/rpc.log"
 func (self *Collector) GetLog() {
 	latestVersion := self.db.GetLatestVersion()
 	t, err := tail.TailFile(file_log, tail.Config{
-		Follow: true, 
+		Follow: true,
 		ReOpen: true})
 
 	if err != nil {
@@ -96,10 +96,13 @@ func (self *Collector) HandleJsonArray(jsonArray []JSON) {
 		method := rbInstance.Method
 		timeResponse, _ := strconv.ParseFloat(jsonEle.RequestTime, 64)
 
-		allSaveData[method] = append(allSaveData[method], []float64{jsonEle.TimeHandled, timeResponse})		
+		allSaveData[method] = append(allSaveData[method], []float64{jsonEle.TimeHandled, timeResponse})
 	}
 	trueStoreData := makeTrueData(allSaveData)
-	self.db.StorageTimeResponse(trueStoreData)
+	err = self.db.StorageTimeResponse(trueStoreData)
+	if err != nil {
+		log.Println("store failed: ", err)
+	}
 }
 
 func makeTrueData(allSaveData map[string][][]float64) map[string][][]float64 {
@@ -110,20 +113,20 @@ func makeTrueData(allSaveData map[string][][]float64) map[string][][]float64 {
 		var tickTime float64
 		var countIndex int
 
-		if (saveData[0][0] / tickDistance) - float64(uint64(saveData[0][0] / tickDistance)) == 0 {
+		if (saveData[0][0]/tickDistance)-float64(uint64(saveData[0][0]/tickDistance)) == 0 {
 			tickTime = saveData[0][0]
 		} else {
-			tickTime = float64(int64((saveData[0][0] + tickDistance)/tickDistance)) * tickDistance	
+			tickTime = float64(int64((saveData[0][0]+tickDistance)/tickDistance)) * tickDistance
 		}
 		for i, data := range saveData {
 			if data[0] <= tickTime {
 				sum += data[1]
-				if i == len(saveData) - 1 {
-					avg := sum / float64(i - countIndex + 1)
+				if i == len(saveData)-1 {
+					avg := sum / float64(i-countIndex+1)
 					if len(trueStoreData[rpc]) > 0 {
 						lenArray := len(trueStoreData[rpc]) - 1
 						oldVal := trueStoreData[rpc][lenArray][1]
-						trueStoreData[rpc][lenArray][1] = (avg + oldVal)/float64(2)
+						trueStoreData[rpc][lenArray][1] = (avg + oldVal) / float64(2)
 					} else {
 						trueStoreData[rpc] = append(trueStoreData[rpc], []float64{tickTime, data[1]})
 					}
@@ -136,7 +139,7 @@ func makeTrueData(allSaveData map[string][][]float64) map[string][][]float64 {
 					countIndex += 1
 				}
 				if i > countIndex {
-					avg := sum / float64(i - countIndex)
+					avg := sum / float64(i-countIndex)
 					trueStoreData[rpc] = append(trueStoreData[rpc], []float64{tickTime, avg})
 					tickTime += tickDistance
 					countIndex = i

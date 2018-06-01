@@ -2,44 +2,44 @@ package storage
 
 import (
 	"bytes"
-	"log"
 	"encoding/binary"
 	"encoding/json"
+	"log"
 
-	"github.com/boltdb/bolt"
 	"github.com/Gin/node-tracker/common"
+	"github.com/boltdb/bolt"
 )
 
 const (
 	PATH string = "/home/ubuntu/go/src/github.com/Gin/node-tracker/storage/gin.db"
 
-	NET_VERSION string = "net_version"
-	NET_PEERCOUNT string = "net_peerCount"
-	NET_LISTENING string = "net_listening"
-	ETH_PROTOCOLVERSION string = "eth_protocolVersion"
-	GAS_PRICE string = "eth_gasPrice"
-	BLOCK_NUM string = "eth_blockNumber"
-	GET_BALANCE string = "eth_getBalance"
-	GET_STORAGE_AT string = "eth_getStorageAt"
-	GET_BLOCKTXCOUNT_BY_NUM string = "eth_getBlockTransactionCountByNumber"
-	GET_TX_COUNT string = "eth_getTransactionCount"
-	GET_CODE string = "eth_getCode"
-	SIGN string = "eth_sign"
-	SEND_TX string = "eth_sendTransaction"
-	SEND_RAW_TX string = "eth_sendRawTransaction"
-	ETH_CALL string = "eth_call"
-	ESTIMAT_GAS string = "eth_estimateGas"
-	GET_BLOCK_BY_HASH string = "eth_getBlockByHash"
-	GET_BLOCK_BY_NUM string = "eth_getBlockByNumber"
-	GET_TX_BY_HASH string = "eth_getTransactionByHash"
-	GET_TX_BY_BLOCK_HASH_AND_INDEX string = "eth_getTransactionByBlockHashAndIndex"
-	GET_TX_BY_BLOCK_NUM_AND_INDEX string = "eth_getTransactionByBlockNumberAndIndex"
-	GET_TX_RECEIPT string = "eth_getTransactionReceipt"
+	NET_VERSION                       string = "net_version"
+	NET_PEERCOUNT                     string = "net_peerCount"
+	NET_LISTENING                     string = "net_listening"
+	ETH_PROTOCOLVERSION               string = "eth_protocolVersion"
+	GAS_PRICE                         string = "eth_gasPrice"
+	BLOCK_NUM                         string = "eth_blockNumber"
+	GET_BALANCE                       string = "eth_getBalance"
+	GET_STORAGE_AT                    string = "eth_getStorageAt"
+	GET_BLOCKTXCOUNT_BY_HASH          string = "eth_getBlockTransactionCountByHash"
+	GET_BLOCKTXCOUNT_BY_NUM           string = "eth_getBlockTransactionCountByNumber"
+	GET_TX_COUNT                      string = "eth_getTransactionCount"
+	GET_CODE                          string = "eth_getCode"
+	SIGN                              string = "eth_sign"
+	SEND_TX                           string = "eth_sendTransaction"
+	SEND_RAW_TX                       string = "eth_sendRawTransaction"
+	ETH_CALL                          string = "eth_call"
+	ESTIMAT_GAS                       string = "eth_estimateGas"
+	GET_BLOCK_BY_HASH                 string = "eth_getBlockByHash"
+	GET_BLOCK_BY_NUM                  string = "eth_getBlockByNumber"
+	GET_TX_BY_HASH                    string = "eth_getTransactionByHash"
+	GET_TX_BY_BLOCK_HASH_AND_INDEX    string = "eth_getTransactionByBlockHashAndIndex"
+	GET_TX_BY_BLOCK_NUM_AND_INDEX     string = "eth_getTransactionByBlockNumberAndIndex"
+	GET_TX_RECEIPT                    string = "eth_getTransactionReceipt"
 	GET_UNCLE_BY_BLOCK_HASH_AND_INDEX string = "eth_getUncleByBlockHashAndIndex"
-	GET_UNCLE_BY_BLOCK_NUM_AND_INDEX string = "eth_getUncleByBlockNumberAndIndex"
-	COMPILE_SOLIDITY string = "eth_compileSolidity"
-	GET_LOG string = "eth_getLogs"
-	ONE string = "1"
+	GET_UNCLE_BY_BLOCK_NUM_AND_INDEX  string = "eth_getUncleByBlockNumberAndIndex"
+	COMPILE_SOLIDITY                  string = "eth_compileSolidity"
+	GET_LOG                           string = "eth_getLogs"
 )
 
 var ListBucket = []string{
@@ -51,6 +51,7 @@ var ListBucket = []string{
 	BLOCK_NUM,
 	GET_BALANCE,
 	GET_STORAGE_AT,
+	GET_BLOCKTXCOUNT_BY_HASH,
 	GET_BLOCKTXCOUNT_BY_NUM,
 	GET_TX_COUNT,
 	GET_CODE,
@@ -69,7 +70,6 @@ var ListBucket = []string{
 	GET_UNCLE_BY_BLOCK_NUM_AND_INDEX,
 	COMPILE_SOLIDITY,
 	GET_LOG,
-	ONE,
 }
 
 type BoltStorage struct {
@@ -93,6 +93,7 @@ func NewStorage() *BoltStorage {
 		tx.CreateBucket([]byte(BLOCK_NUM))
 		tx.CreateBucket([]byte(GET_BALANCE))
 		tx.CreateBucket([]byte(GET_STORAGE_AT))
+		tx.CreateBucket([]byte(GET_BLOCKTXCOUNT_BY_HASH))
 		tx.CreateBucket([]byte(GET_BLOCKTXCOUNT_BY_NUM))
 		tx.CreateBucket([]byte(GET_TX_COUNT))
 		tx.CreateBucket([]byte(GET_CODE))
@@ -111,7 +112,6 @@ func NewStorage() *BoltStorage {
 		tx.CreateBucket([]byte(GET_UNCLE_BY_BLOCK_NUM_AND_INDEX))
 		tx.CreateBucket([]byte(COMPILE_SOLIDITY))
 		tx.CreateBucket([]byte(GET_LOG))
-		tx.CreateBucket([]byte(ONE))
 
 		return nil
 	})
@@ -132,16 +132,17 @@ func bytesToUint64(b []byte) uint64 {
 func (self *BoltStorage) StorageTimeResponse(allSaveData map[string][][]float64) error {
 	var err error
 	self.db.Update(func(tx *bolt.Tx) error {
-		for rpc, d := range(allSaveData) {
+		for rpc, d := range allSaveData {
+			log.Printf("rpc method: %v", rpc)
 			var dataJson []byte
 			b := tx.Bucket([]byte(rpc))
 
-			for _, data := range(d) {
+			for _, data := range d {
 				timeCount := uint64(data[0])
 				responseTime := data[1]
 				dataJson, err = json.Marshal(responseTime)
 				if err != nil {
-					log.Println(err)
+					log.Printf("error: %v", err)
 					return err
 				}
 				err = b.Put(uint64ToBytes(timeCount), dataJson)
@@ -159,7 +160,7 @@ func (self *BoltStorage) GetTimeResponseData(fromTime uint64) ([]common.TimeResp
 	data := common.NewDataTimeResponse()
 	var err error
 	self.db.View(func(tx *bolt.Tx) error {
-		for _, bucket := range(ListBucket) {
+		for _, bucket := range ListBucket {
 			queryData(tx, data, bucket, fromTime)
 		}
 		return nil
@@ -195,7 +196,7 @@ func queryData(tx *bolt.Tx, data *common.DataTimeResponse, bucket string, fromTi
 func (self *BoltStorage) GetLatestVersion() float64 {
 	latestTimeByte := uint64ToBytes(0)
 	self.db.View(func(tx *bolt.Tx) error {
-		for _, bucket := range(ListBucket) {
+		for _, bucket := range ListBucket {
 			b := tx.Bucket([]byte(bucket))
 			c := b.Cursor()
 			latest, _ := c.Last()
